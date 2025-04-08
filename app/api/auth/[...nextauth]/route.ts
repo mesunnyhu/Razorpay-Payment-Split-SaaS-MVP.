@@ -1,13 +1,14 @@
+// app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions = {
   providers: [
-    Credentials({
+    CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         if (
@@ -17,10 +18,13 @@ export const authOptions = {
           return { id: "1", name: "Admin", email: "admin@gmail.com" };
         }
         return null;
-      },
-    }),
+      }
+    })
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/signin"
+  }
 };
 
 const handler = NextAuth(authOptions);
