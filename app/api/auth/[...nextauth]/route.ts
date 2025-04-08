@@ -1,36 +1,29 @@
-// app/api/auth/[...nextauth]/route.ts
-import NextAuth, { NextAuthOptions } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import clientPromise from "@/lib/mongodb";
-import { Session, User } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
-export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+export const authOptions = {
   providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        // Replace this with your user validation logic
+        const user = {
+          id: "1",
+          name: "Admin User",
+          email: credentials?.email,
+        };
+
+        if (user) return user;
+        return null;
+      },
     }),
   ],
-  callbacks: {
-    async session({
-      session,
-      user,
-    }: {
-      session: Session;
-      user: User;
-      token: JWT;
-    }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: user.id,
-        },
-      };
-    },
+  pages: {
+    signIn: "/login",
   },
 };
 
