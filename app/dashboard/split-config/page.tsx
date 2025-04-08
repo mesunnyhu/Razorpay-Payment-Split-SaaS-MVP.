@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 
 type Split = {
   email: string;
   percentage: string;
 };
 
+const TEMP_EMAIL = "admin@gmail.com"; // Replace with actual user ID/email later
+
 export default function SplitConfigPage() {
-  const { data: session } = useSession();
   const [splits, setSplits] = useState<Split[]>([{ email: "", percentage: "" }]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -28,8 +28,9 @@ export default function SplitConfigPage() {
     setLoading(true);
     const res = await fetch("/api/splits", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: session?.user?.email,
+        userId: TEMP_EMAIL,
         splits,
       }),
     });

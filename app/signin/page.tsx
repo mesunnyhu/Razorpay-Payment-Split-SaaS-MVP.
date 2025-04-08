@@ -1,6 +1,5 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -12,14 +11,10 @@ export default function SignIn() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false
-    });
-
-    if (res?.ok) {
-      router.push('/');
+    // Dummy login validation
+    if (email === 'admin@gmail.com' && password === 'admin123') {
+      localStorage.setItem('userEmail', email); // save login state
+      router.push('/dashboard');
     } else {
       alert("Invalid credentials");
     }

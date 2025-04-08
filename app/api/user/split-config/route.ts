@@ -1,23 +1,21 @@
-// app/api/user/split-config/route.ts
 import { NextRequest } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import { getAuthSession } from "@/lib/auth";
+
+// TEMP: Replace this with your own logic or real user ID
+const TEMP_USER_ID = "admin@gmail.com";
 
 export async function POST(req: NextRequest) {
-  const session = await getAuthSession();
-  if (!session?.user?.email) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
   const body = await req.json();
+  if (!body.splits) {
+    return new Response("Missing split data", { status: 400 });
+  }
 
   const client = await clientPromise;
   const db = client.db();
 
-  // Save or update split config
   await db.collection("splits").updateOne(
-    { userId: session.user.email },
-    { $set: { userId: session.user.email, splits: body.splits } },
+    { userId: TEMP_USER_ID },
+    { $set: { userId: TEMP_USER_ID, splits: body.splits } },
     { upsert: true }
   );
 
@@ -25,14 +23,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const session = await getAuthSession();
-  if (!session?.user?.email) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
   const client = await clientPromise;
   const db = client.db();
 
-  const config = await db.collection("splits").findOne({ userId: session.user.email });
+  const config = await db.collection("splits").findOne({ userId: TEMP_USER_ID });
   return new Response(JSON.stringify(config?.splits || []), { status: 200 });
 }

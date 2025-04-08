@@ -1,19 +1,28 @@
-import { getAuthSession } from "@/lib/auth";
-import clientPromise from "@/lib/mongodb";
+"use client";
 
-export default async function PaymentsPage() {
-  const session = await getAuthSession();
-  if (!session?.user?.email) {
-    return <div className="p-6 text-red-500">You must be logged in.</div>;
-  }
+import { useEffect, useState } from "react";
 
-  const client = await clientPromise;
-  const db = client.db();
-  const payments = await db
-    .collection("payments")
-    .find({ userId: session.user.email })
-    .sort({ createdAt: -1 })
-    .toArray();
+export default function PaymentsPage() {
+  const [payments, setPayments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPayments() {
+      try {
+        const res = await fetch("/api/user/payments");
+        const data = await res.json();
+        setPayments(data);
+      } catch (err) {
+        console.error("Failed to load payments:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPayments();
+  }, []);
+
+  if (loading) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="p-6">
@@ -22,7 +31,7 @@ export default async function PaymentsPage() {
       {payments.length === 0 && <p>No payments found.</p>}
 
       {payments.map((payment) => (
-        <div key={payment._id.toString()} className="mb-4 border p-4 rounded bg-gray-100">
+        <div key={payment._id} className="mb-4 border p-4 rounded bg-gray-100">
           <p><strong>Payment ID:</strong> {payment.razorpayPaymentId}</p>
           <p><strong>Amount:</strong> ₹{payment.amount} {payment.currency}</p>
           <p><strong>Date:</strong> {new Date(payment.createdAt).toLocaleString()}</p>

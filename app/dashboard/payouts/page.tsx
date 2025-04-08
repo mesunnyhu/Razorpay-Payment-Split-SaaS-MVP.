@@ -1,21 +1,22 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+
+// TEMP EMAIL for MVP/testing
+const TEMP_EMAIL = "admin@gmail.com";
 
 export default function PayoutHistory() {
-  const { data: session } = useSession();
   const [payouts, setPayouts] = useState([]);
 
   useEffect(() => {
     const fetchPayouts = async () => {
-      const res = await fetch(`/api/payouts?email=${session?.user?.email}`);
+      const res = await fetch(`/api/payouts?email=${TEMP_EMAIL}`);
       const data = await res.json();
       setPayouts(data);
     };
 
-    if (session?.user?.email) fetchPayouts();
-  }, [session]);
+    fetchPayouts();
+  }, []);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
