@@ -1,5 +1,11 @@
 import { NextRequest } from "next/server";
-import clientPromise from "@/lib/mongodb";
+import { MongoClient } from "mongodb";
+
+const clientPromise = (async () => {
+  const client = new MongoClient(process.env.MONGODB_URI || "");
+  await client.connect();
+  return client;
+})();
 
 export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get("email");
